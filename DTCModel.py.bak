@@ -1,8 +1,8 @@
 import pandas as pd
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OrdinalEncoder
 import joblib
-class GBCModel(object):  
+class DTCModel(object):  
     
     def __init__(self):
         
@@ -18,7 +18,7 @@ class GBCModel(object):
         
         print("Encoder loaded")
         
-        self.model = joblib.load("GBC.pkl")
+        self.model = joblib.load("DTC.pkl")
         
         print("Model loaded")
         
@@ -27,8 +27,8 @@ class GBCModel(object):
         self.tries = 0
         self.success = 0
         self.value = 0
-
         
+
     def predict(self,X,features_names):
 
         df = pd.DataFrame(X, columns=features_names)
@@ -36,13 +36,12 @@ class GBCModel(object):
         df[self.categorical_features] = self.encoder.transform(df[self.categorical_features])
         df = df.reindex(sorted(df.columns), axis=1)
         
-        predictions = self.model.predict_proba(df)
+        predictions = self.model.predict(df)
         
         return predictions
 
-    
     def send_feedback(self, features, feature_names, reward, truth, routing=None):
-        print("GBC model send-feedback entered")
+        print("DTC model send-feedback entered")
         print(f"Truth: {truth}, Reward: {reward}")
 
         if reward == 1:
@@ -70,44 +69,44 @@ class GBCModel(object):
             "type": "GAUGE",
             "key": "true_pos_total",
             "value": self.cm["tp"],
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
         tn = {
             "type": "GAUGE",
             "key": "true_neg_total",
             "value": self.cm["tn"],
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
         fp = {
             "type": "GAUGE",
             "key": "false_pos_total",
             "value": self.cm["fp"],
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
         fn = {
             "type": "GAUGE",
             "key": "false_neg_total",
             "value": self.cm["fn"],
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
 
         value = {
             "type": "GAUGE",
             "key": "branch_value",
             "value": self.value,
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
         success = {
             "type": "GAUGE",
             "key": "n_success_total",
             "value": self.success,
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
         tries = {
             "type": "GAUGE",
             "key": "n_tries_total",
             "value": self.tries,
-            "tags": {"branch_name": "GBC"},
+            "tags": {"branch_name": "DTC"},
         }
 
         return [tp, tn, fp, fn, value, success, tries]

@@ -36,7 +36,7 @@ class DTCModel(object):
         df[self.categorical_features] = self.encoder.transform(df[self.categorical_features])
         df = df.reindex(sorted(df.columns), axis=1)
         
-        predictions = self.model.predict(df)
+        predictions = self.model.predict_proba(df)
         
         return predictions
 
